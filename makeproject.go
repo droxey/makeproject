@@ -15,8 +15,10 @@ import (
 
 // Project stores information about a new project.
 type Project struct {
-	Name        string
-	ProjectType options.Alias
+	Name         string
+	ProjectType  options.Alias
+	OutputDir    string
+	TemplatesDir string
 }
 
 func main() {
@@ -48,23 +50,27 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
+		// Store the data about the new project.
 		project := Project{Name: _name, ProjectType: strings.ToLower(_tmpl)}
-		templatesPath := "templates/" + project.ProjectType
-		templateExt := ".tmpl"
+		project.TemplatesDir = "./templates/" + project.ProjectType
 
 		// Create a directory for the project if it doesn't exist.
-		outputPath := "./output/" + project.Name
-		filehandler.CreateDirIfNotExist(outputPath)
+		project.OutputDir = "./output/" + project.Name
+		filehandler.CreateDirIfNotExist(project.OutputDir)
 
 		// Parse the templates for the project.
-		paths, _ := filehandler.GetAllFilePathsInDirectory(templatesPath)
-		for _, path := range paths {
+		templateFiles, _ := filehandler.GetAllFilePathsInDirectory(project.TemplatesDir)
+		commonFiles, _ := filehandler.GetAllFilePathsInDirectory("./templates/common")
+		templateFiles = append(templateFiles, commonFiles...)
+		templateExt := ".tmpl"
+		for _, path := range templateFiles {
 			// Execute each template.
 			templateString := filehandler.ProcessFile(path, project)
-			fileName := strings.Replace(path, templatesPath, "", 1)
-			finalFilePath, _ := filepath.Abs(outputPath + fileName[0:len(fileName)-len(templateExt)])
+			fileName := filepath.Base(path)
+			finalFilePath, _ := filepath.Abs(project.OutputDir + "/" + fileName[0:len(fileName)-len(templateExt)])
 			filehandler.WriteToFile(finalFilePath, templateString)
 		}
+
 		return nil
 	}
 
