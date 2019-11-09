@@ -33,7 +33,7 @@ func main() {
 	}
 
 	// Configure the CLI application's flags.
-	var _name, _type string
+	var _name, _tmpl string
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "name",
@@ -41,14 +41,14 @@ func main() {
 			Destination: &_name,
 		},
 		cli.StringFlag{
-			Name:        "type",
-			Usage:       "--type=python",
-			Destination: &_type,
+			Name:        "template",
+			Usage:       "--template=django",
+			Destination: &_tmpl,
 		},
 	}
 
 	app.Action = func(c *cli.Context) error {
-		project := Project{Name: _name, ProjectType: strings.ToLower(_type)}
+		project := Project{Name: _name, ProjectType: strings.ToLower(_tmpl)}
 		templatesPath := "templates/" + project.ProjectType
 		templateExt := ".tmpl"
 
