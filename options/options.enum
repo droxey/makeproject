@@ -1,0 +1,8 @@
+type:
+    string
+name:
+    option
+list:
+    Python = "python"
+    Flask = "flask"
+    Django = "django"
